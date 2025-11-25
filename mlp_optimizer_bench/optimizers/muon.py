@@ -19,7 +19,7 @@ from torch.optim.optimizer import ParamsT
 
 from mlp_optimizer_bench.optimizers import triton_kernels
 
-from mlp_optimizer_bench.optimizers import WeightDecayT
+from mlp_optimizer_bench.optimizers.mixin import WeightDecayT
 from mlp_optimizer_bench.optimizers import muon_utils
 from mlp_optimizer_bench.optimizers.orthogonalized_optimizer import OrthogonalizedOptimizer, _args_doc
 
