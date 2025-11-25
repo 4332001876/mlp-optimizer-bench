@@ -14,8 +14,8 @@ from mlp_optimizer_bench.datasets.function_regression import (
 )
 
 from mlp_optimizer_bench.arguments import parse_args
-from mlp_optimizer_bench.mlp import MLP
-from mlp_optimizer_bench.trainer import Trainer, TrainerConfig
+from mlp_optimizer_bench.models import MLP
+from mlp_optimizer_bench.training import Trainer, TrainerConfig
 from mlp_optimizer_bench.optimizers.muon import Muon
 
 

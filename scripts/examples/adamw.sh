@@ -1,4 +1,4 @@
-python run_optim_bench.py \
+python -m mlp_optimizer_bench.run_optim_bench \
   --dataset high_order_cls \
   --n-features 50 \
   --hidden-dims 256,256,256 \

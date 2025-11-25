@@ -1,7 +1,5 @@
 # mlp_optimizer_bench/datasets/__init__.py
 
-from .toy_classification import *
-from .mnist import *
 
 from .high_order_classification import (
     HighOrderClassificationConfig,
