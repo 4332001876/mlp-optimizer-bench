@@ -127,6 +127,35 @@ def parse_args():
     )
     parser.add_argument("--muon-use-syrk", action="store_true")
 
+    # SpectralBall 专用
+    group = parser.add_argument_group(title='spectral-ball')
+    group.add_argument('--spectral-ball-momentum', type=float, default=0.9,
+                       help='Momentum coefficient for SpectralBall optimizer')
+    group.add_argument('--spectral-ball-use-nesterov', action='store_true', default=True,
+                       help='Use Nesterov-style momentum in SpectralBall')
+    group.add_argument('--spectral-ball-msign-steps', type=int, default=8,
+                       help='Number of Newton-Schulz iteration steps for matrix sign function in SpectralBall')
+    group.add_argument('--spectral-ball-solver', type=str, default='bisection',
+                       choices=['bisection'],
+                       help='Solver method for Lagrange multiplier λ in SpectralBall ')
+    group.add_argument('--spectral-ball-solver-tolerance-f', type=float, default=1e-8,
+                       help='Function value tolerance for solver in SpectralBall (applies to  bisection methods)')
+    group.add_argument('--spectral-ball-solver-max-iterations', type=int, default=20,
+                       help='Maximum iterations for solver in SpectralBall (applies to  bisection methods)')
+    group.add_argument('--spectral-ball-radius-mode', type=str, default='spectral_mup',
+                       choices=['spectral_mup', 'identity', 'initialize'],
+                       help='Mode for computing target radius R in SpectralBall')
+    group.add_argument('--spectral-ball-power-iteration-steps', type=int, default=20,
+                       help='Number of power iteration steps for computing top singular vectors in SpectralBall')
+    group.add_argument('--spectral-ball-scale-mode', type=str, default='align_adamw_rms',
+                       choices=['align_adamw_rms', 'spectral_mup', 'shape_scaling'],
+                       help='Scale mode for SpectralBall optimizer (mirrors Muon scale modes)')
+    group.add_argument('--spectral-ball-retract-mode', type=str, default='hard',
+                       choices=['hard', 'dynamic'],
+                       help='Retraction mode for SpectralBall: hard (project to sphere) or dynamic (gradual adjustment)')
+    group.add_argument('--spectral-ball-retract-alpha', type=float, default=0.05,
+                       help='Step size for dynamic retraction mode (ignored for hard mode)')
+
     # ... 你可以在这里继续添加其他超参数
 
     args = parser.parse_args()
