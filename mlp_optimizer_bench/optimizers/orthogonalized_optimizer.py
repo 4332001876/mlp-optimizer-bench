@@ -39,6 +39,8 @@ _args_doc = """params: Iterable of parameters to optimize or dicts defining para
         weight_decay_method: Method to apply weight decay, see :class:`~emerging_optimizers.mixin.WeightDecayMixin`
             for more details.
         fp32_matmul_prec: Precision of the matmul operations in optimizer states GEMM operations.
+        adamw_betas: The betas for AdamW optimizer used for 1D parameters. Default: (0.9, 0.95)
+        adamw_eps: The epsilon for AdamW optimizer used for 1D parameters. Default: 1e-8
 """
 
 
@@ -107,6 +109,8 @@ class OrthogonalizedOptimizer(opt_mixin.WeightDecayMixin, optim.Optimizer):
         scaled_orthogonalize_fn: Callable | None = None,
         log_per_module_update_rms: bool = False,
         log_per_module_grad_rms: bool = False,
+        adamw_betas: tuple[float, float] = (0.9, 0.95),
+        adamw_eps: float = 1e-8,
         **kwargs: Any,
     ):
         if scaled_orthogonalize_fn is None:
@@ -125,11 +129,14 @@ class OrthogonalizedOptimizer(opt_mixin.WeightDecayMixin, optim.Optimizer):
             lr=lr,
             momentum_beta=momentum_beta,
             weight_decay=weight_decay,
+            adamw_betas=adamw_betas,
+            adamw_eps=adamw_eps,
             **kwargs,
         )
 
         super().__init__(params, default_args_dict)
         self.scaled_orthogonalize_fn = scaled_orthogonalize_fn
+        self.global_step = 0  # For AdamW bias correction
 
     @torch.no_grad()  # type: ignore[misc]
     @override
@@ -144,6 +151,9 @@ class OrthogonalizedOptimizer(opt_mixin.WeightDecayMixin, optim.Optimizer):
         else:
             loss = closure()
 
+        # Increment global step counter for AdamW
+        self.global_step += 1
+
         # Clear previous update RMS statistics (once per optimizer step)
         if self.log_per_module_update_rms:
             self.per_module_update_rms.clear()
@@ -151,10 +161,12 @@ class OrthogonalizedOptimizer(opt_mixin.WeightDecayMixin, optim.Optimizer):
         if self.log_per_module_grad_rms:
             self.per_module_grad_rms.clear()
 
+        # ========= Phase 1: Handle 2D+ parameters with orthogonalization =========
         for group in self.param_groups:
             for p in group["params"]:
-                if p.dim() == 1:
-                    raise ValueError(f"{self.__class__.__name__} does not support 1D parameters")
+                if p.dim() < 2:  # Skip 1D parameters in this phase
+                    continue
+
                 grad = p.grad
                 if grad is None:
                     continue
@@ -210,6 +222,60 @@ class OrthogonalizedOptimizer(opt_mixin.WeightDecayMixin, optim.Optimizer):
                 # perform weight update
                 # scale is applied to have update RMS == 1
                 p.add_(grad, alpha=-group["lr"])
+
+        # ========= Phase 2: Handle 1D parameters with AdamW =========
+        for group in self.param_groups:
+            beta1, beta2 = group.get('adamw_betas', (0.9, 0.95))
+            eps = group.get('adamw_eps', 1e-8)
+
+            for p in group["params"]:
+                if p.dim() >= 2:  # Skip 2D+ parameters in this phase
+                    continue
+
+                grad = p.grad
+                if grad is None:
+                    continue
+                state = self.state[p]
+
+                # Initialize AdamW buffers
+                if 'adamw_exp_avg' not in state:
+                    state['adamw_exp_avg'] = torch.zeros_like(grad)
+                    state['adamw_exp_avg_sq'] = torch.zeros_like(grad)
+
+                buf1 = state['adamw_exp_avg']
+                buf2 = state['adamw_exp_avg_sq']
+
+                # Update biased first moment estimate
+                buf1.lerp_(grad, 1 - beta1)
+                # Update biased second raw moment estimate
+                buf2.lerp_(grad.square(), 1 - beta2)
+
+                # Compute bias-corrected update direction
+                g = buf1 / (eps + buf2.sqrt())
+
+                # Bias correction
+                bias_correction1 = 1 - beta1 ** self.global_step
+                bias_correction2 = 1 - beta2 ** self.global_step
+                scale = bias_correction1 / bias_correction2 ** 0.5
+
+                # Apply decoupled weight decay
+                p.data.mul_(1 - group["lr"] * group["weight_decay"])
+
+                # Apply update
+                p.data.add_(g, alpha=-group["lr"] / scale)
+
+                # Log grad/update RMS if enabled
+                if self.log_per_module_grad_rms:
+                    grad_rms = torch.sqrt(torch.mean(grad ** 2)).item()
+                    param_name = getattr(p, 'param_name', None)
+                    if param_name:
+                        self.per_module_grad_rms[param_name] = grad_rms
+
+                if self.log_per_module_update_rms:
+                    update_rms = torch.sqrt(torch.mean(g ** 2)).item()
+                    param_name = getattr(p, 'param_name', None)
+                    if param_name:
+                        self.per_module_update_rms[param_name] = update_rms
 
         return loss
 
