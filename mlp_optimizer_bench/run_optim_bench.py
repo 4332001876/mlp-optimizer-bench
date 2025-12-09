@@ -127,6 +127,7 @@ def main():
         activation=activation_cls,
         activate_last=False,
         init_type=args.init_type,
+        init_sigma=args.init_sigma,
         bias_init=args.bias_init,
     )
 

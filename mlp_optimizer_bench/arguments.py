@@ -56,6 +56,7 @@ def parse_args():
             "kaiming_normal",
             "normal",
             "uniform",
+            "spectral_mup_init",
             "none",
         ],
     )
@@ -64,6 +65,12 @@ def parse_args():
         type=str,
         default="zero",
         choices=["zero", "normal", "none"],
+    )
+    parser.add_argument(
+        "--init-sigma",
+        type=float,
+        default=0.02,
+        help="标准差参数，用于 spectral_mup_init 初始化方法",
     )
 
     # ===== 训练控制 =====

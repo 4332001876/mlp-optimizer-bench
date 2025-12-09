@@ -3,6 +3,8 @@ python -m mlp_optimizer_bench.run_optim_bench \
   --n-features 50 \
   --hidden-dims 256,256,256 \
   --optimizer spectral_ball \
+  --init-type spectral_mup_init \
+  --init-sigma 1.0 \
   --lr 3e-4 \
   --weight-decay 0.1 \
   --max-steps 2000 \
@@ -14,7 +16,7 @@ python -m mlp_optimizer_bench.run_optim_bench \
   --spectral-ball-solver-tolerance-f 2e-4 \
   --spectral-ball-solver-max-iterations 20 \
   --spectral-ball-radius-mode spectral_mup \
-  --spectral-ball-power-iteration-steps 20 \
-  --spectral-ball-scale-mode align_adamw_rms \
+  --spectral-ball-power-iteration-steps 100 \
+  --spectral-ball-scale-mode spectral_mup \
   --spectral-ball-retract-mode hard \
   --spectral-ball-retract-alpha 0.05
