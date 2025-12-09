@@ -17,6 +17,7 @@ from mlp_optimizer_bench.arguments import parse_args
 from mlp_optimizer_bench.models import MLP
 from mlp_optimizer_bench.training import Trainer, TrainerConfig
 from mlp_optimizer_bench.optimizers.muon import Muon
+from mlp_optimizer_bench.optimizers.spectral_ball import SpectralBall
 
 
 def build_activation(name: str):
@@ -52,6 +53,23 @@ def build_optimizer(args, model_params):
             scale_mode=args.muon_scale_mode,
             extra_scale_factor=args.muon_extra_scale_factor,
             use_syrk=args.muon_use_syrk,
+        )
+    elif args.optimizer == "spectral_ball":
+        return SpectralBall(
+            model_params,
+            lr=args.lr,
+            momentum_beta=args.spectral_ball_momentum,
+            weight_decay=args.weight_decay,
+            use_nesterov=args.spectral_ball_use_nesterov,
+            power_iteration_steps=args.spectral_ball_power_iteration_steps,
+            msign_steps=args.spectral_ball_msign_steps,
+            solver=args.spectral_ball_solver,
+            solver_tolerance_f=args.spectral_ball_solver_tolerance_f,
+            solver_max_iterations=args.spectral_ball_solver_max_iterations,
+            radius_mode=args.spectral_ball_radius_mode,
+            scale_mode=args.spectral_ball_scale_mode,
+            retract_mode=args.spectral_ball_retract_mode,
+            retract_alpha=args.spectral_ball_retract_alpha,
         )
     else:
         raise ValueError(f"Unknown optimizer: {args.optimizer}")

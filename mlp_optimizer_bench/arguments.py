@@ -103,7 +103,7 @@ def parse_args():
         "--optimizer",
         type=str,
         default="adamw",
-        choices=["adamw", "muon"],
+        choices=["adamw", "muon", "spectral_ball"],
     )
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--weight-decay", type=float, default=0.01)
