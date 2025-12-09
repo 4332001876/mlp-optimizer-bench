@@ -1,0 +1,20 @@
+python -m mlp_optimizer_bench.run_optim_bench \
+  --dataset high_order_cls \
+  --n-features 50 \
+  --hidden-dims 256,256,256 \
+  --optimizer spectral_ball \
+  --lr 3e-4 \
+  --weight-decay 0.1 \
+  --max-steps 2000 \
+  --device cuda \
+  --spectral-ball-momentum 0.9 \
+  --spectral-ball-use-nesterov \
+  --spectral-ball-msign-steps 8 \
+  --spectral-ball-solver bisection \
+  --spectral-ball-solver-tolerance-f 2e-4 \
+  --spectral-ball-solver-max-iterations 20 \
+  --spectral-ball-radius-mode spectral_mup \
+  --spectral-ball-power-iteration-steps 20 \
+  --spectral-ball-scale-mode align_adamw_rms \
+  --spectral-ball-retract-mode hard \
+  --spectral-ball-retract-alpha 0.05
