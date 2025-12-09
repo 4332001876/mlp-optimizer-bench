@@ -5,7 +5,7 @@ python -m mlp_optimizer_bench.run_optim_bench \
   --optimizer adamw \
   --init-type spectral_mup_init \
   --init-sigma 1.0 \
-  --lr 3e-4 \
+  --lr 3e-3 \
   --weight-decay 0.1 \
   --max-steps 2000 \
   --device cuda

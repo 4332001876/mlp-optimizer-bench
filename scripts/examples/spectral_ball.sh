@@ -5,7 +5,7 @@ python -m mlp_optimizer_bench.run_optim_bench \
   --optimizer spectral_ball \
   --init-type spectral_mup_init \
   --init-sigma 1.0 \
-  --lr 3e-4 \
+  --lr 1e-2 \
   --weight-decay 0.1 \
   --max-steps 2000 \
   --device cuda \
@@ -13,7 +13,7 @@ python -m mlp_optimizer_bench.run_optim_bench \
   --spectral-ball-use-nesterov \
   --spectral-ball-msign-steps 8 \
   --spectral-ball-solver bisection \
-  --spectral-ball-solver-tolerance-f 2e-4 \
+  --spectral-ball-solver-tolerance-f 1e-3 \
   --spectral-ball-solver-max-iterations 20 \
   --spectral-ball-radius-mode spectral_mup \
   --spectral-ball-power-iteration-steps 100 \
