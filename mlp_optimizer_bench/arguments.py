@@ -150,7 +150,7 @@ def parse_args():
     group.add_argument('--spectral-ball-solver-max-iterations', type=int, default=20,
                        help='Maximum iterations for solver in SpectralBall (applies to  bisection methods)')
     group.add_argument('--spectral-ball-radius-mode', type=str, default='spectral_mup',
-                       choices=['spectral_mup', 'identity', 'initialize'],
+                       choices=['spectral_mup', 'identity'],
                        help='Mode for computing target radius R in SpectralBall')
     group.add_argument('--spectral-ball-power-iteration-steps', type=int, default=20,
                        help='Number of power iteration steps for computing top singular vectors in SpectralBall')

@@ -96,8 +96,8 @@ class SpectralBall(OrthogonalizedOptimizer):
             raise ValueError(f"msign_steps must be at least 1, got {msign_steps}")
         if solver not in ("bisection"):
             raise ValueError(f"Invalid solver: {solver}, must be one of:  bisection")
-        if radius_mode not in ("spectral_mup", "identity", "initialize"):
-            raise ValueError(f"Invalid radius_mode: {radius_mode}, must be one of: spectral_mup, identity, initialize")
+        if radius_mode not in ("spectral_mup", "identity"):
+            raise ValueError(f"Invalid radius_mode: {radius_mode}, must be one of: spectral_mup, identity")
         if retract_mode not in ("hard", "dynamic"):
             raise ValueError(f"Invalid retract_mode: {retract_mode}, must be one of: hard, dynamic")
         if qkv_split_mode not in ("component", "group"):

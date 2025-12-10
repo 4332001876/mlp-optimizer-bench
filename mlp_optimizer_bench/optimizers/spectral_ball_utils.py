@@ -53,6 +53,7 @@ def msign(G: torch.Tensor, steps: int) -> torch.Tensor:
             a, b, c = coeffs[-1]
         X = _muon_newton_schulz_step(X, a, b, c)
 
+    X = X.to(torch.float32)
     return X.mT if transpose else X
 
 
