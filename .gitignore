@@ -16,5 +16,6 @@ onelogger.err
 runs/
 /test_cases/
 **/dist/
-*.pyc
 
+*.pyc
+__pycache__/
